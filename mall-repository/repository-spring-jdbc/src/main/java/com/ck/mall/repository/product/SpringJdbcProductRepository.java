@@ -1,7 +1,6 @@
-package com.ck.mall.repository;
+package com.ck.mall.repository.product;
 
 import com.ck.mall.repository.data.product.Product;
-import com.ck.mall.repository.product.ProductRepository;
 
 import java.util.Optional;
 

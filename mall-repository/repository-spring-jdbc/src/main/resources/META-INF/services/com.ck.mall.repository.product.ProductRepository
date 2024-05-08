@@ -1,1 +1,1 @@
-com.ck.mall.repository.SpringJdbcProductRepository
+com.ck.mall.repository.product.SpringJdbcProductRepository
