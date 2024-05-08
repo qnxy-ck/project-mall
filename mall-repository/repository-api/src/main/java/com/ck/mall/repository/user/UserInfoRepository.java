@@ -15,6 +15,12 @@ public interface UserInfoRepository {
     UserInfoRepository INSTANCE = ServiceLoaderUtil.find(UserInfoRepository.class);
 
 
+    /**
+     * 增加一条新纪录
+     *
+     * @param userInfo 待添加的数据
+     * @return 数据影响条数
+     */
     int insert(UserInfo userInfo);
 
     /**
