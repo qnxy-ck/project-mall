@@ -7,26 +7,18 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
-import java.security.SecureRandom;
 import java.util.Objects;
+
+import static com.ck.mall.repository.RandomPhoneNumber.nextPhoneNumber;
 
 /**
  * @author Qnxy
  */
 @Slf4j
-public class JdbcSupportTests {
+public class SpringJdbcSupportTests {
 
+    private final JdbcTransaction jdbcTransaction = JdbcTransaction.INSTANCE;
 
-//    private static final Logger log = LoggerFactory.getLogger(JdbcSupportTests.class);
-
-    private static final SecureRandom RANDOM = new SecureRandom();
-
-    /**
-     * 随机获取一个手机号
-     */
-    private static String nextPhoneNumber() {
-        return String.valueOf(RANDOM.nextInt(1, 99999));
-    }
 
     /**
      * 构建用户信息
@@ -49,7 +41,7 @@ public class JdbcSupportTests {
     @Test
     public void insertUserInfoTypeOne() {
 
-        int update = JdbcSupport.jdbcClient()
+        int update = SpringJdbcSupport.jdbcClient()
                 .sql("insert into user_info (phone_number, username, password, user_profile_picture) " +
                         "values (?, ?, ?, ?)")
                 .param(1, nextPhoneNumber())
@@ -68,7 +60,7 @@ public class JdbcSupportTests {
     public void insertUserInfoTypeTwo() {
         UserInfo userInfo = getUserInfo();
 
-        int update = JdbcSupport.jdbcClient()
+        int update = SpringJdbcSupport.jdbcClient()
                 .sql("insert into user_info (phone_number, username, password, user_profile_picture) " +
                         "values (:phoneNumber, :username, :password, :userProfilePicture)")
                 .paramSource(userInfo)
@@ -86,7 +78,7 @@ public class JdbcSupportTests {
 
         final KeyHolder keyHolder = new GeneratedKeyHolder();
 
-        int update = JdbcSupport.jdbcClient()
+        int update = SpringJdbcSupport.jdbcClient()
                 .sql("insert into user_info (phone_number, username, password, user_profile_picture) " +
                         "values (:phoneNumber, :username, :password, :userProfilePicture)")
                 .paramSource(userInfo)
@@ -108,7 +100,7 @@ public class JdbcSupportTests {
      */
     @Test
     public void selectAll() {
-        JdbcClient jdbcClient = JdbcSupport.jdbcClient();
+        JdbcClient jdbcClient = SpringJdbcSupport.jdbcClient();
 
         jdbcClient.sql("select * from user_info")
                 .query(UserInfo.class)
@@ -121,7 +113,7 @@ public class JdbcSupportTests {
      */
     @Test
     public void selectByIdOptional() {
-        JdbcSupport.jdbcClient()
+        SpringJdbcSupport.jdbcClient()
                 .sql("select * from user_info where id = ?")
                 .param(1, 3)
                 .query(UserInfo.class)
@@ -134,7 +126,7 @@ public class JdbcSupportTests {
      */
     @Test
     public void selectByUsernameAndPasswordOptional() {
-        JdbcSupport.jdbcClient()
+        SpringJdbcSupport.jdbcClient()
                 .sql("select * from user_info where username = ? and password = ? ")
                 .param(1, "ck")
                 .param(2, "admin")
@@ -149,7 +141,7 @@ public class JdbcSupportTests {
      */
     @Test
     public void deleteById() {
-        int update = JdbcSupport.jdbcClient()
+        int update = SpringJdbcSupport.jdbcClient()
                 .sql("delete from user_info where id = ?")
                 .param(1, 2)
                 .update();
@@ -162,8 +154,8 @@ public class JdbcSupportTests {
      */
     @Test
     public void transactionTest() {
-        UserInfo userInfo = JdbcSupport.transactionTemplate().execute(it -> {
-            JdbcSupport.jdbcClient()
+        UserInfo userInfo = jdbcTransaction.executeTransaction(() -> {
+            SpringJdbcSupport.jdbcClient()
                     .sql("update user_info set user_profile_picture = ? where id = ?")
                     .param(1, "ccc.jpg")
                     .param(2, 2)
@@ -171,7 +163,7 @@ public class JdbcSupportTests {
 
             int i = 1 / 0;
 
-            return JdbcSupport.jdbcClient()
+            return SpringJdbcSupport.jdbcClient()
                     .sql("select * from user_info where id = ?")
                     .param(1, 2)
                     .query(UserInfo.class).single();

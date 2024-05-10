@@ -1,6 +1,7 @@
 package com.ck.mall.repository.data.user;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
  * @author Qnxy
  */
 @Data
+@Accessors(chain = true)
 public class UserInfo {
 
     /**
@@ -38,6 +40,11 @@ public class UserInfo {
     private String userProfilePicture;
 
     /**
+     * 用户类型
+     */
+    private UserType userType;
+
+    /**
      * 创建时间 (必填)
      */
     private LocalDateTime createdAt;
@@ -47,4 +54,20 @@ public class UserInfo {
      */
     private LocalDateTime updatedAt;
 
+
+    /**
+     * 用户类型
+     */
+    public enum UserType {
+        /**
+         * 普通用户
+         */
+        GENERAL_USER,
+
+        /**
+         * 管理员
+         */
+        ADMIN_USER,
+
+    }
 }
