@@ -1,21 +1,17 @@
 package com.ck.mall.repository;
 
-import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.support.JdbcTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.util.function.Supplier;
+
 /**
- * jdbc工具
+ * Spring jdbc 实现的事务管理
  *
  * @author Qnxy
  */
-public class JdbcSupport {
-
-    /**
-     * 获取jdbc执行器客户端封装
-     */
-    private static final JdbcClient JDBC_CLIENT = JdbcClient.create(MallProjectDataSource.getDataSource());
+public final class SpringJdbcTransaction implements JdbcTransaction {
 
     /**
      * jdbc事物处理器
@@ -29,17 +25,13 @@ public class JdbcSupport {
     }
 
 
-    /**
-     * 获取jdbc执行器
-     */
-    public static JdbcClient jdbcClient() {
-        return JDBC_CLIENT;
+    @Override
+    public <T> T executeTransaction(Supplier<T> executor) {
+        return TRANSACTION_TEMPLATE.execute(it -> executor.get());
     }
 
-    /**
-     * 获取jdbc事物管理器
-     */
-    public static TransactionTemplate transactionTemplate() {
-        return TRANSACTION_TEMPLATE;
+    @Override
+    public void executeTransaction(Runnable executor) {
+        TRANSACTION_TEMPLATE.executeWithoutResult(it -> executor.run());
     }
 }
